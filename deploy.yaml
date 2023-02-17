@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pay-service
+  namespace: payment
+spec:
+  selector:
+    matchLabels:
+      app: pay-service
+  template:
+    metadata:
+      labels:
+        app: pay-service
+    spec:
+      containers:
+        - name: pay-service
+          image: nexus.sberbank.kz:5035/pay-service:0.0.8
+          #          readinessProbe:
+          #            httpGet:
+          #              path: /healthz
+          #              port: 8080
+          #          livenessProbe:
+          #            httpGet:
+          #              port: 8080
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+              name: api-access
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pay-service
+  namespace: payment
+spec:
+  selector:
+    app: pay-service
+  ports:
+    - port: 8080
+      protocol: TCP
+      targetPort: 8080
+
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: pay-service-route
+  namespace: payment
+spec:
+  #  host: ""
+  to:
+    kind: Service
+    name: pay-service
+    weight: 100
+  port:
+    targetPort: 8080
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: None

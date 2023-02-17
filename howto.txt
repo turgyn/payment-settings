@@ -1,0 +1,10 @@
+docker build -t nexus.sberbank.kz:5035/pay-service:0.0.5 . --no-cache
+
+#### Выполняется разово#############
+Добавить строку в файл daemon.json
+insecure-registries:["nexus.sberbank.kz:5035"]
+docker login  -u u11549 nexus.sberbank.kz:5035
+##############################
+
+docker push nexus.sberbank.kz:5035/pay-service:0.0.7
+oc apply -f deploy.yaml
